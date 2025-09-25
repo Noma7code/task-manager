@@ -4,6 +4,8 @@ require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const mongoConnect = require("./config/mongoDB");
 const { authRouter } = require("./route/authRouter");
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("./swagger-output.json");
 
 const app = express();
 
@@ -19,6 +21,9 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+
+//swagger endpoint
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
