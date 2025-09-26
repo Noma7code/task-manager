@@ -113,7 +113,7 @@ async function logoutUser(req, res) {
 //delete account
 async function deleteUserAccount(req, res) {
   try {
-    const userId = req.user.id;
+    const userId = req.userId;
     const deletedUser = await userModel.findByIdAndDelete(userId);
     if (!deletedUser) {
       return res
@@ -124,7 +124,7 @@ async function deleteUserAccount(req, res) {
     res.clearCookie("access_token");
     res
       .status(200)
-      .json({ sucess: true, message: "User Account deleted successfully" });
+      .json({ success: true, message: "User Account deleted successfully" });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

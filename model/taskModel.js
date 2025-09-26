@@ -5,7 +5,7 @@ const taskSchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
-      unique: true,
+      required: true,
     },
     task_name: { type: String, required: true },
     state: {

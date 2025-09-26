@@ -6,6 +6,7 @@ const mongoConnect = require("./config/mongoDB");
 const { authRouter } = require("./route/authRouter");
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger-output.json");
+const taskRouter = require("./route/taskRoutes");
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/tasks/", taskRouter);
 
 //swagger endpoint
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -28,3 +30,5 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
 });
+
+module.exports = app;
