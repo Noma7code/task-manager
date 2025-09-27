@@ -32,8 +32,16 @@ async function createTask(req, res) {
 
 //get all task
 async function getAllTask(req, res) {
+  const { state } = req.query;
   try {
-    const tasks = await taskModel.find({ user_id: req.userId });
+    const filter = { user_id: req.userId };
+
+    if (state === "pending" || state === "completed") {
+      filter.state = state;
+    }
+
+    const tasks = await taskModel.find(filter);
+
     return res.status(200).json({
       success: true,
       message: tasks.length ? "Tasks fetched successfully" : "No tasks found",

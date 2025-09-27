@@ -99,32 +99,41 @@ async function loginUser(req, res) {
 //logout user
 async function logoutUser(req, res) {
   try {
-    res.clearCookie("access_token", process.env.JWT_SECRET, {
+    res.clearCookie("access_token", {
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
-    res.status(200).json({ success: true, message: "Logged out successfully" });
+    // send JSON instead of redirect
+    return res
+      .status(200)
+      .json({ success: true, message: "Logged out successfully" });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
-
-//delete account
+// delete account
 async function deleteUserAccount(req, res) {
   try {
     const userId = req.userId;
     const deletedUser = await userModel.findByIdAndDelete(userId);
+
     if (!deletedUser) {
       return res
         .status(404)
-        .json({ success: false, message: "user not found" });
+        .json({ success: false, message: "User not found" });
     }
 
-    res.clearCookie("access_token");
-    res
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return res
       .status(200)
-      .json({ success: true, message: "User Account deleted successfully" });
+      .json({ success: true, message: "User account deleted successfully" });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
