@@ -27,7 +27,7 @@ It also supports user account management features like logout and account deleti
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/task-manager.git
+   git clone https://github.com/Noma7code/task-manager.git
    cd task-manager
    ```
 2. Install dependencies:
@@ -44,7 +44,7 @@ It also supports user account management features like logout and account deleti
    ```
    npm start
    ```
-5. Visit [http://localhost:3000](http://localhost:3000) in your browser.
+5. Visit [http://localhost:8080](http://localhost:8080) in your browser.
 
 ---
 
@@ -54,7 +54,7 @@ It also supports user account management features like logout and account deleti
 
 #### Register User
 
-- **POST** `/api/auth/register`
+- **POST** `/api/auth/register-user`
 - **Body:** `{ "name": "John", "email": "john@example.com", "password": "yourpassword" }`
 - **Response:**
   ```json
@@ -66,7 +66,7 @@ It also supports user account management features like logout and account deleti
 
 #### Login User
 
-- **POST** `/api/auth/login`
+- **POST** `/api/auth/login-user`
 - **Body:** `{ "email": "john@example.com", "password": "yourpassword" }`
 - **Response:**
   ```json
@@ -78,7 +78,7 @@ It also supports user account management features like logout and account deleti
 
 #### Logout User
 
-- **POST** `/api/auth/logout`
+- **POST** `/api/auth/logout-user`
 - **Response:**
   ```json
   {
@@ -120,7 +120,7 @@ It also supports user account management features like logout and account deleti
 
 #### Get All Tasks
 
-- **GET** `/api/tasks`
+- **GET** `/api/tasks/get-all-tasks`
 - **Response:**
   ```json
   {
@@ -134,7 +134,7 @@ It also supports user account management features like logout and account deleti
 
 #### Update Task State
 
-- **PATCH** `/api/tasks/:id/update-state`
+- **PATCH** `/api/tasks/update-task/:taskId`
 - **Body:** `{ "state": "Completed" }`
 - **Response:**
   ```json
@@ -146,7 +146,7 @@ It also supports user account management features like logout and account deleti
 
 #### Delete Task
 
-- **DELETE** `/api/tasks/:id/delete`
+- **DELETE** `/api/tasks/delete-task/:taskId`
 - **Response:**
   ```json
   {
@@ -154,30 +154,6 @@ It also supports user account management features like logout and account deleti
     "message": "Task deleted"
   }
   ```
-
----
-
-## Folder Structure
-
-```
-task-manager/
-├── controller/
-│   ├── authController.js
-│   └── tasksController.js
-├── route/
-│   ├── authRouter.js
-│   └── taskRoutes.js
-├── views/
-│   ├── index.ejs
-│   ├── login.ejs
-│   ├── register.ejs
-│   └── tasks.ejs
-├── app.js
-├── package.json
-└── README.md
-```
-
----
 
 ## License
 
