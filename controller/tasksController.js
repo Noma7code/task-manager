@@ -97,10 +97,10 @@ async function deleteTask(req, res) {
 }
 async function updateTaskToDelete(req, res) {
   try {
-    const { id } = req.params;
+    const { taskId } = req.params;
 
-    const task = await Task.findOneAndUpdate(
-      { _id: id, user: req.user._id },
+    const task = await taskModel.findOneAndUpdate(
+      { _id: taskId, user_id: req.userId },
       { state: "deleted" },
       { new: true }
     );

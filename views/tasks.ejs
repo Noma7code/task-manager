@@ -41,69 +41,13 @@
         text-decoration: line-through;
         color: gray;
       }
-
-      /* User menu */
-      .user-menu {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-      }
-      .circle-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #333;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        font-size: 20px;
-      }
-      .dropdown {
-        display: none;
-        position: absolute;
-        top: 50px;
-        right: 0;
-        background: #fff;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 10px;
-      }
-      .dropdown a {
-        display: block;
-        padding: 5px;
-        color: #333;
-        text-decoration: none;
-        cursor: pointer;
-      }
-      .dropdown a:hover {
-        background: #f0f0f0;
-      }
-
-      /* Mobile responsive */
-      @media (max-width: 600px) {
-        .container {
-          max-width: 100%;
-          padding: 10px;
-        }
-        .task {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        .task div {
-          margin-top: 10px;
-        }
+      .deleted {
+        color: red;
+        font-style: italic;
       }
     </style>
   </head>
   <body>
-    <div class="user-menu">
-      <button class="circle-btn" id="menuBtn">☰</button>
-      <div class="dropdown" id="userDropdown">
-        <a href="#" id="logoutLink">Logout</a>
-        <a href="#" id="deleteAccountLink">Delete Account</a>
-      </div>
-    </div>
-
     <div class="container">
       <h1>Hello <%= name %></h1>
 
@@ -114,6 +58,7 @@
           <option value="">All</option>
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
+          <option value="deleted">Deleted</option>
         </select>
       </div>
 
@@ -139,18 +84,23 @@
           data-state="<%= task.state %>"
         >
           <span
-            class="<%= task.state === 'completed' ? 'completed' : '' %>"
+            class="<%= task.state === 'completed' ? 'completed' : task.state === 'deleted' ? 'deleted' : '' %>"
             contenteditable="false"
             ><%= task.task_name %> - <%= task.state %></span
           >
           <div>
+            <% if (task.state !== 'deleted') { %>
             <button class="toggleBtn">
               <%= task.state === 'completed' ? 'Mark Pending' : 'Mark Completed'
               %>
             </button>
             <button class="editBtn">Edit</button>
             <button class="saveBtn" style="display: none">Save</button>
-            <button class="deleteBtn">Delete</button>
+            <button class="softDeleteBtn">Move to Trash</button>
+            <% } else { %>
+            <button class="restoreBtn">Restore</button>
+            <button class="hardDeleteBtn">Delete Permanently</button>
+            <% } %>
           </div>
         </div>
         <% }) %>
@@ -161,14 +111,6 @@
       const createForm = document.getElementById("createTaskForm");
       const taskList = document.getElementById("taskList");
       const filterState = document.getElementById("filterState");
-      const menuBtn = document.getElementById("menuBtn");
-      const userDropdown = document.getElementById("userDropdown");
-
-      // Toggle dropdown menu
-      menuBtn.addEventListener("click", () => {
-        userDropdown.style.display =
-          userDropdown.style.display === "block" ? "none" : "block";
-      });
 
       // Create task
       createForm.addEventListener("submit", async (e) => {
@@ -211,10 +153,40 @@
           else alert(data.message);
         }
 
-        // Delete task
-        if (e.target.classList.contains("deleteBtn")) {
+        // Soft delete
+        if (e.target.classList.contains("softDeleteBtn")) {
+          const res = await fetch(
+            `/api/tasks/update-task-to-delete/${taskId}`,
+            {
+              method: "PUT",
+              credentials: "include",
+            }
+          );
+          const data = await res.json();
+          if (data.success) location.reload();
+          else alert(data.message);
+        }
+
+        // Hard delete
+        if (e.target.classList.contains("hardDeleteBtn")) {
+          if (!confirm("This will permanently delete the task. Continue?"))
+            return;
+
           const res = await fetch(`/api/tasks/delete-task/${taskId}`, {
             method: "DELETE",
+            credentials: "include",
+          });
+          const data = await res.json();
+          if (data.success) location.reload();
+          else alert(data.message);
+        }
+
+        // Restore
+        if (e.target.classList.contains("restoreBtn")) {
+          const res = await fetch(`/api/tasks/update-task/${taskId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ state: "pending" }),
             credentials: "include",
           });
           const data = await res.json();
@@ -262,42 +234,6 @@
           }
         });
       });
-
-      // Logout
-      document
-        .getElementById("logoutLink")
-        .addEventListener("click", async (e) => {
-          e.preventDefault();
-          const res = await fetch("/api/auth/logout-user", {
-            method: "POST",
-            credentials: "include",
-          });
-          const data = await res.json();
-          if (data.success) {
-            window.location.href = "/";
-          } else {
-            alert(data.message || "Logout failed");
-          }
-        });
-
-      // Delete account
-      document
-        .getElementById("deleteAccountLink")
-        .addEventListener("click", async (e) => {
-          e.preventDefault();
-          if (!confirm("Are you sure you want to delete your account?")) return;
-
-          const res = await fetch("/api/auth/delete-user-account", {
-            method: "DELETE",
-            credentials: "include",
-          });
-          const data = await res.json();
-          if (data.success) {
-            window.location.href = "/";
-          } else {
-            alert(data.message || "Account deletion failed");
-          }
-        });
     </script>
   </body>
 </html>
