@@ -95,10 +95,30 @@ async function deleteTask(req, res) {
     return errorHandler(res, error);
   }
 }
+async function updateTaskToDelete(req, res) {
+  try {
+    const { id } = req.params;
 
+    const task = await Task.findOneAndUpdate(
+      { _id: id, user: req.user._id },
+      { state: "deleted" },
+      { new: true }
+    );
+
+    if (!task)
+      return res
+        .status(404)
+        .json({ success: false, message: "Task not found" });
+
+    res.json({ success: true, message: "Task moved to trash", task });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error });
+  }
+}
 module.exports = {
   createTask,
   getAllTask,
   updateTask,
   deleteTask,
+  updateTaskToDelete,
 };
