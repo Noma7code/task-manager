@@ -30,17 +30,18 @@ async function createTask(req, res) {
   }
 }
 
-//get all task
+// getAllTask
 async function getAllTask(req, res) {
   const { state } = req.query;
   try {
     const filter = { user_id: req.userId };
 
-    if (state === "pending" || state === "completed") {
+    // include deleted, pending, completed or no filter (all)
+    if (state === "pending" || state === "completed" || state === "deleted") {
       filter.state = state;
     }
 
-    const tasks = await taskModel.find(filter);
+    const tasks = await taskModel.find(filter).sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,
@@ -51,6 +52,7 @@ async function getAllTask(req, res) {
     return errorHandler(res, error);
   }
 }
+
 // update task
 async function updateTask(req, res) {
   const { task_name, state } = req.body;
